@@ -14,7 +14,7 @@ Browse Vietnamese bakery products with search, category filtering, sorting, stoc
 
 Customers can create an account before placing and tracking orders.
 
-![Customer Registration](screenshots/register.png)
+![Customer Registration](screenshots/Register.png)
 
 ### Shopping Cart
 
@@ -118,11 +118,9 @@ The application currently includes product management, shopping cart, authentica
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/Louis6198/Bakery_Sales_App.git
 cd Bakery_Sales_App
 ```
-
-> Replace `<your-repository-url>` with the GitHub repository URL after the repository is published.
 
 ### 2. Backend Setup
 
