@@ -1,15 +1,21 @@
-
+import os
+from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 from jose import  JWTError, jwt
 from passlib.context import CryptContext
+
+load_dotenv()
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
-SECRET_KEY = "bakery-secret-key-change-this-later"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
+)
 
 
 def hash_password(password: str):
