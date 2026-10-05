@@ -1,0 +1,100 @@
+:root {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #2d241f;
+  background: #faf7f2;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  /* BRAND COLORS */
+  --color-primary: #8b5e3c;
+  --color-primary-dark: #68432b;
+  --color-primary-light: #f3e7dc;
+
+  --color-background: #faf7f2;
+  --color-surface: #ffffff;
+
+  --color-text: #2d241f;
+  --color-text-muted: #786b63;
+
+  --color-border: #e6ddd5;
+
+  --color-success: #3f7d58;
+  --color-danger: #b94a48;
+
+  /* SHADOWS */
+  --shadow-sm:
+    0 2px 8px rgba(45, 36, 31, 0.06);
+
+  --shadow-md:
+    0 8px 24px rgba(45, 36, 31, 0.10);
+
+  /* BORDER RADIUS */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  /* SPACING */
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+
+  min-width: 320px;
+  min-height: 100vh;
+
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
