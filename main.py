@@ -362,27 +362,6 @@ def register_user(
         user
     )
 
-@app.post("/setup-admin", response_model=schemas.UserResponse)
-def setup_admin(
-    user: schemas.UserCreate,
-    db: Session = Depends(get_db)
-):
-    existing_user = crud.get_user_by_email(db, user.email)
-
-    if existing_user:
-        return crud.update_user_to_admin(
-            db=db,
-            user=existing_user,
-            password=user.password
-        )
-
-    return crud.create_admin(
-        db=db,
-        name=user.name,
-        email=user.email,
-        password=user.password
-    )
-
 @app.post(
     "/login",
     response_model=schemas.TokenResponse
