@@ -362,6 +362,27 @@ def register_user(
         user
     )
 
+@app.put("/promote-admin")
+def promote_admin(
+    db: Session = Depends(get_db)
+):
+    user = crud.promote_user_to_admin(
+        db=db,
+        email="admin@camhuebakery.com"
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return {
+        "message": "User promoted to admin successfully",
+        "email": user.email,
+        "role": user.role
+    }
+
 @app.post("/setup-admin", response_model=schemas.UserResponse)
 def setup_admin(
     user: schemas.UserCreate,
@@ -382,28 +403,6 @@ def setup_admin(
         email=user.email,
         password=user.password
     )
-
-
-@app.put("/reset-admin-password")
-def reset_admin_password(
-    db: Session = Depends(get_db)
-):
-    user = crud.reset_user_password(
-        db=db,
-        email="admin@camhuebakery.com",
-        new_password="Admin123456"
-    )
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="Admin not found"
-        )
-
-    return {
-        "message": "Admin password reset successfully"
-    }
-
 
 @app.post(
     "/login",
