@@ -143,8 +143,11 @@ def delete_product(
     if product is None:
         return None
 
-    db.delete(product)
+    # Soft delete - keep product for old order history
+    product.is_available = False
+
     db.commit()
+    db.refresh(product)
 
     return product
 
