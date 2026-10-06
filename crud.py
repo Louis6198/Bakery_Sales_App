@@ -29,9 +29,13 @@ def get_products(
         )
 
     # AVAILABLE FILTER
-    if available is not None:
+    if available is None:
         query = query.filter(
-            models.Product.is_available == available
+            models.Product.is_available == True
+        )
+    else:
+        query = query.filter(
+         models.Product.is_available == available
         )
 
     # SORTING
