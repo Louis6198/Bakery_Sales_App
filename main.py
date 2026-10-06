@@ -370,9 +370,10 @@ def setup_admin(
     existing_user = crud.get_user_by_email(db, user.email)
 
     if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
+        return crud.update_user_to_admin(
+            db=db,
+            user=existing_user,
+            password=user.password
         )
 
     return crud.create_admin(
@@ -381,6 +382,28 @@ def setup_admin(
         email=user.email,
         password=user.password
     )
+
+
+@app.put("/reset-admin-password")
+def reset_admin_password(
+    db: Session = Depends(get_db)
+):
+    user = crud.reset_user_password(
+        db=db,
+        email="admin@camhuebakery.com",
+        new_password="Admin123456"
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Admin not found"
+        )
+
+    return {
+        "message": "Admin password reset successfully"
+    }
+
 
 @app.post(
     "/login",
