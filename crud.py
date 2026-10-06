@@ -306,3 +306,25 @@ def create_user(
     db.refresh(new_user)
 
     return new_user
+
+def create_admin(
+    db: Session,
+    name: str,
+    email: str,
+    password: str
+):
+    hashed_password = hash_password(password)
+
+    new_admin = models.User(
+        name=name,
+        email=email,
+        hashed_password=hashed_password,
+        role="admin",
+        is_active=True
+    )
+
+    db.add(new_admin)
+    db.commit()
+    db.refresh(new_admin)
+
+    return new_admin
