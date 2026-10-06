@@ -314,42 +314,7 @@ def create_user(
 
     return new_user
 
-def create_admin(
-    db: Session,
-    name: str,
-    email: str,
-    password: str
-):
-    hashed_password = hash_password(password)
 
-    new_admin = models.User(
-        name=name,
-        email=email,
-        hashed_password=hashed_password,
-        role="admin",
-        is_active=True
-    )
-
-    db.add(new_admin)
-    db.commit()
-    db.refresh(new_admin)
-
-    return new_admin
-
-
-def update_user_to_admin(
-    db: Session,
-    user: models.User,
-    password: str
-):
-    user.role = "admin"
-    user.is_active = True
-    user.hashed_password = hash_password(password)
-
-    db.commit()
-    db.refresh(user)
-
-    return user
 
 def promote_user_to_admin(
     db: Session,
