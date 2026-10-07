@@ -4,6 +4,16 @@ A full-stack e-commerce application for selling Vietnamese snacks and sweets in 
 
 Built with **React, FastAPI, SQLAlchemy, JWT authentication, and Stripe Checkout**, the application supports product browsing, shopping cart management, customer authentication, secure payment processing, order creation, and automatic inventory updates through Stripe webhooks.
 
+## 🌐 Live Demo
+
+**Frontend:** https://cam-hue-bakery.onrender.com
+
+**Backend API:** https://cam-hue-bakery-api.onrender.com
+
+**API Documentation:** https://cam-hue-bakery-api.onrender.com/docs
+
+> Note: The backend is hosted on Render's free tier and may take up to a minute to wake up after a period of inactivity.
+
 ## 🚀 Project Highlights
 
 - Full-stack architecture with React frontend and FastAPI backend
@@ -345,17 +355,17 @@ frontend/.env.example
 
 Real `.env` files are excluded from Git and should never contain secrets committed to the repository.
 
-## Future Improvements
+## 🚀 Future Improvements
 
 Potential future improvements include:
 
-- Expanded admin dashboard functionality
-- Product image upload and cloud storage
-- Production PostgreSQL database
-- Cloud deployment and custom domain
+- Cloud-based product image upload and storage
 - Email order confirmations
-- Automated unit and integration testing
-- Improved order tracking and shipping workflow
+- Customer shipping address management
+- Improved order tracking
+- Automated backend and frontend testing
+- Custom domain
+- Production monitoring and logging
 
 ## What I Learned
 
