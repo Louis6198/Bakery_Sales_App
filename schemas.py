@@ -121,3 +121,11 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     user: UserResponse
+
+class CheckoutItem(BaseModel):
+    product_id: int
+    quantity: int
+
+
+class CheckoutSessionCreate(BaseModel):
+    items: list[CheckoutItem]

@@ -3,6 +3,7 @@ function ProductCard({
     currentUser,
     fallbackImage,
     addToCart,
+    addedProductId,
     startEditProduct,
     deleteProduct,
     deletingProductId
@@ -53,7 +54,11 @@ function ProductCard({
 
                 {currentUser?.role !== "admin" && (
                     <button
-                        className="cart-button"
+                        className={
+                            addedProductId === product.id
+                                ? "cart-button added"
+                                : "cart-button"
+                        }
                         onClick={() =>
                             addToCart(product)
                         }
@@ -62,7 +67,9 @@ function ProductCard({
                             product.stock === 0
                         }
                     >
-                        Add to Cart
+                        {addedProductId === product.id
+                            ? "✓ Added!"
+                            : "Add to Cart"}
                     </button>
                 )}
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom"
+import { Routes, Route, Navigate, useNavigate, useSearchParams } from "react-router-dom"
 import "./App.css"
 import AdminDashboard from "./components/AdminDashboard"
 import ProductCard from "./components/ProductCard"
@@ -26,7 +26,10 @@ function App() {
       : []
   })
 
+  const [addedProductId, setAddedProductId] = useState(null)
+
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [authMode, setAuthMode] = useState("login")
   const [authName, setAuthName] = useState("")
   const [authEmail, setAuthEmail] = useState("")
@@ -34,6 +37,7 @@ function App() {
   const [authMessage, setAuthMessage] = useState("")
   const [authLoading, setAuthLoading] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [lastOrderId, setLastOrderId] = useState(null)
 
   const [token, setToken] = useState(() => {
     return localStorage.getItem("token") || ""
@@ -338,7 +342,30 @@ function App() {
     fetchOrders()
   }, [token, currentUser])
 
+ useEffect(() => {
+  const paymentStatus = searchParams.get("payment")
+
+  if (paymentStatus === "success") {
+    setOrderMessage(
+      "Payment successful! Your order has been created."
+    )
+    setCart([])
+
+    navigate("/cart", { replace: true })
+  }
+
+  if (paymentStatus === "cancelled") {
+    setOrderMessage(
+      "Payment was cancelled. Your cart has been kept."
+    )
+
+    navigate("/cart", { replace: true })
+  }
+}, [searchParams, navigate])
   const addToCart = (product) => {
+
+    setLastOrderId(null)
+    setOrderMessage("")
 
     const existingProduct = cart.find(
       (item) => item.id === product.id
@@ -372,6 +399,12 @@ function App() {
       ])
 
     }
+
+    setAddedProductId(product.id)
+
+    setTimeout(() => {
+      setAddedProductId(null)
+    }, 1000)
   }
 
   const increaseQuantity = (productId) => {
@@ -426,8 +459,6 @@ function App() {
 
     if (checkoutLoading) return
 
-    setCheckoutLoading(true)
-
     if (!currentUser || !token) {
       setOrderMessage(
         "Please login before placing an order."
@@ -440,10 +471,9 @@ function App() {
       return
     }
 
-    const orderData = {
-      customer_name: currentUser.name,
-      customer_email: currentUser.email,
+    setCheckoutLoading(true)
 
+    const checkoutData = {
       items: cart.map((item) => ({
         product_id: item.id,
         quantity: item.quantity
@@ -452,7 +482,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${API_URL}/orders`,
+        `${API_URL}/create-checkout-session`,
         {
           method: "POST",
 
@@ -461,7 +491,7 @@ function App() {
             "Authorization": `Bearer ${token}`
           },
 
-          body: JSON.stringify(orderData)
+          body: JSON.stringify(checkoutData)
         }
 
       )
@@ -470,18 +500,21 @@ function App() {
 
       if (!response.ok) {
         setOrderMessage(
-          data.detail || "Could not create order."
+          typeof data.detail === "string"
+            ? data.detail
+            : "Could not start checkout."
         )
         return
       }
 
-      setOrderMessage(
-        `Order #${data.id} created successfully!`
-      )
+      if (!data.checkout_url) {
+        setOrderMessage(
+          "Stripe checkout URL was not returned."
+        )
+        return
+      }
 
-      setCart([])
-
-      await fetchOrders()
+      window.location.href = data.checkout_url
 
     } catch (error) {
       console.error("Order error:", error)
@@ -789,7 +822,33 @@ function App() {
           element={
             <main>
 
-              <div className="products-heading">
+              <section className="store-hero">
+                <p className="hero-eyebrow">CẨM HUÊ BAKERY</p>
+
+                <h2>
+                  Hương vị Việt Nam,
+                  <br />
+                  gửi đến bạn tại Canada.
+                </h2>
+
+                <p className="hero-description">
+                  Những món bánh và kẹo Việt Nam quen thuộc,
+                  được chọn để thưởng thức và chia sẻ cùng gia đình.
+                </p>
+
+                <button
+                  className="hero-button"
+                  onClick={() =>
+                    document
+                      .getElementById("products")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  Shop Our Products
+                </button>
+              </section>
+
+              <div className="products-heading" id="products">
                 <p className="section-label">
                   Our Collection
                 </p>
@@ -827,8 +886,8 @@ function App() {
                     Candy
                   </option>
 
-                  <option value="Snack">
-                    Snack
+                  <option value="Cake">
+                    Cake
                   </option>
                 </select>
 
@@ -894,6 +953,7 @@ function App() {
                       currentUser={currentUser}
                       fallbackImage={fallbackImage}
                       addToCart={addToCart}
+                      addedProductId={addedProductId}
                       startEditProduct={startEditProduct}
                       deleteProduct={deleteProduct}
                       deletingProductId={deletingProductId}
@@ -928,6 +988,7 @@ function App() {
                 placeOrder={placeOrder}
                 orderMessage={orderMessage}
                 checkoutLoading={checkoutLoading}
+                lastOrderId={lastOrderId}
               />
             )
           }

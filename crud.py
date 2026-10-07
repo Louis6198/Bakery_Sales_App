@@ -12,70 +12,46 @@ def get_products(
     available: bool | None = None,
     skip: int = 0,
     limit: int = 10,
-    sort: str | None = None
+    sort: str | None = None,
 ):
     query = db.query(models.Product)
 
     # SEARCH
     if search:
-        query = query.filter(
-            models.Product.name.ilike(f"%{search}%")
-        )
+        query = query.filter(models.Product.name.ilike(f"%{search}%"))
 
     # CATEGORY FILTER
     if category:
-        query = query.filter(
-            models.Product.category == category
-        )
+        query = query.filter(models.Product.category == category)
 
     # AVAILABLE FILTER
     if available is None:
-        query = query.filter(
-            models.Product.is_available == True
-        )
+        query = query.filter(models.Product.is_available == True)
     else:
-        query = query.filter(
-         models.Product.is_available == available
-        )
+        query = query.filter(models.Product.is_available == available)
 
     # SORTING
     if sort == "price_asc":
-        query = query.order_by(
-            models.Product.price.asc()
-        )
+        query = query.order_by(models.Product.price.asc())
 
     elif sort == "price_desc":
-        query = query.order_by(
-            models.Product.price.desc()
-        )
+        query = query.order_by(models.Product.price.desc())
 
     # PAGINATION
     return query.offset(skip).limit(limit).all()
 
 
 def get_product(db: Session, product_id: int):
-    return db.query(models.Product).filter(
-        models.Product.id == product_id
-    ).first()
-
-def get_product_by_sku(
-    db: Session,
-    sku: str
-):
-    return db.query(models.Product).filter(
-        models.Product.sku == sku
-    ).first()
+    return db.query(models.Product).filter(models.Product.id == product_id).first()
 
 
-def create_product(
-    db: Session,
-    product: schemas.ProductCreate
-):
+def get_product_by_sku(db: Session, sku: str):
+    return db.query(models.Product).filter(models.Product.sku == sku).first()
 
-    existing_product = get_product_by_sku(
-        db,
-        product.sku
-    )
+
+def create_product(db: Session, product: schemas.ProductCreate):
+
+    existing_product = get_product_by_sku(db, product.sku)
 
     if existing_product:
         return None
@@ -88,7 +64,7 @@ def create_product(
         category=product.category,
         stock=product.stock,
         is_available=product.is_available,
-        image_url=product.image_url
+        image_url=product.image_url,
     )
 
     db.add(new_product)
@@ -99,30 +75,18 @@ def create_product(
 
 
 def update_product(
-    db: Session,
-    product_id: int,
-    updated_product: schemas.ProductCreate
+    db: Session, product_id: int, updated_product: schemas.ProductCreate
 ):
 
-    product = get_product(
-        db,
-        product_id
-    )
+    product = get_product(db, product_id)
 
     if product is None:
         return None
 
-    existing_product = get_product_by_sku(
-        db,
-        updated_product.sku
-    )
+    existing_product = get_product_by_sku(db, updated_product.sku)
 
-    if (
-        existing_product
-        and existing_product.id != product_id
-    ):
+    if existing_product and existing_product.id != product_id:
         return "sku_exists"
-
 
     product.sku = updated_product.sku
     product.name = updated_product.name
@@ -138,10 +102,8 @@ def update_product(
 
     return product
 
-def delete_product(
-    db: Session,
-    product_id: int
-):
+
+def delete_product(db: Session, product_id: int):
     product = get_product(db, product_id)
 
     if product is None:
@@ -155,54 +117,36 @@ def delete_product(
 
     return product
 
-def create_order(
-    db: Session,
-    order: schemas.OrderCreate,
-    user: models.User
 
+def create_order(
+    db: Session, order: schemas.OrderCreate, user: models.User, auto_commit: bool = True
 ):
+
     total = 0
     order_products = []
 
     # 1. Check every product
     for item in order.items:
 
-        product = get_product(
-            db,
-            item.product_id
-        )
+        product = get_product(db, item.product_id)
 
         if product is None:
-            return {
-                "error": "product_not_found",
-                "product_id": item.product_id
-            }
+            return {"error": "product_not_found", "product_id": item.product_id}
 
         # 2. Check availability
         if not product.is_available:
-            return {
-                "error": "product_unavailable",
-                "product_id": item.product_id
-            }
+            return {"error": "product_unavailable", "product_id": item.product_id}
 
         # 3. Check stock
         if item.quantity > product.stock:
-            return {
-                "error": "not_enough_stock",
-                "product_id": item.product_id
-            }
+            return {"error": "not_enough_stock", "product_id": item.product_id}
 
         # 4. Calculate line total
-        line_total = (
-            product.price * item.quantity
-        )
+        line_total = product.price * item.quantity
 
         total += line_total
 
-        order_products.append({
-            "product": product,
-            "quantity": item.quantity
-        })
+        order_products.append({"product": product, "quantity": item.quantity})
 
     # 5. Create Order
     new_order = models.Order(
@@ -210,7 +154,7 @@ def create_order(
         customer_name=user.name,
         customer_email=user.email,
         total=total,
-        status="pending"
+        status="pending",
     )
 
     db.add(new_order)
@@ -227,7 +171,7 @@ def create_order(
             product_id=product.id,
             product_name=product.name,
             price=product.price,
-            quantity=quantity
+            quantity=quantity,
         )
 
         db.add(new_item)
@@ -236,40 +180,33 @@ def create_order(
         product.stock -= quantity
 
     # 8. Save everything
-    db.commit()
-    db.refresh(new_order)
+
+    if auto_commit:
+        db.commit()
+        db.refresh(new_order)
+    else:
+        db.flush()
 
     return new_order
+
 
 def get_orders(db: Session):
     return db.query(models.Order).all()
 
-def get_orders_by_email(
-    db: Session,
-    email: str
-):
-    return db.query(models.Order).filter(
-        models.Order.customer_email == email
-    ).all()
 
-def get_orders_by_user_id(
-    db: Session,
-    user_id: int
-):
-    return db.query(models.Order).filter(
-        models.Order.user_id == user_id
-    ).all()
+def get_orders_by_email(db: Session, email: str):
+    return db.query(models.Order).filter(models.Order.customer_email == email).all()
+
+
+def get_orders_by_user_id(db: Session, user_id: int):
+    return db.query(models.Order).filter(models.Order.user_id == user_id).all()
+
 
 def get_order(db: Session, order_id: int):
-    return db.query(models.Order).filter(
-        models.Order.id == order_id
-    ).first()
+    return db.query(models.Order).filter(models.Order.id == order_id).first()
 
-def update_order_status(
-    db: Session,
-    order_id: int,
-    status: str
-):
+
+def update_order_status(db: Session, order_id: int, status: str):
     order = get_order(db, order_id)
 
     if order is None:
@@ -283,29 +220,19 @@ def update_order_status(
     return order
 
 
-def get_user_by_email(
-    db: Session,
-    email: str
-):
-    return db.query(models.User).filter(
-        models.User.email == email
-    ).first()
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter(models.User.email == email).first()
 
 
-def create_user(
-    db: Session,
-    user: schemas.UserCreate
-):
-    hashed_password = hash_password(
-        user.password
-    )
+def create_user(db: Session, user: schemas.UserCreate):
+    hashed_password = hash_password(user.password)
 
     new_user = models.User(
         name=user.name,
         email=user.email,
         hashed_password=hashed_password,
         role="customer",
-        is_active=True
+        is_active=True,
     )
 
     db.add(new_user)
@@ -315,11 +242,7 @@ def create_user(
     return new_user
 
 
-
-def promote_user_to_admin(
-    db: Session,
-    email: str
-):
+def promote_user_to_admin(db: Session, email: str):
     user = get_user_by_email(db, email)
 
     if not user:
@@ -331,3 +254,34 @@ def promote_user_to_admin(
     db.refresh(user)
 
     return user
+
+
+def get_stripe_payment_by_session(db: Session, stripe_session_id: str):
+    return (
+        db.query(models.StripePayment)
+        .filter(models.StripePayment.stripe_session_id == stripe_session_id)
+        .first()
+    )
+
+
+def create_stripe_payment(
+    db: Session,
+    stripe_session_id: str,
+    order_id: int,
+    auto_commit: bool = True
+):
+    payment = models.StripePayment(
+        stripe_session_id=stripe_session_id,
+        order_id=order_id,
+        status="completed"
+    )
+
+    db.add(payment)
+
+    if auto_commit:
+        db.commit()
+        db.refresh(payment)
+    else:
+        db.flush()
+
+    return payment

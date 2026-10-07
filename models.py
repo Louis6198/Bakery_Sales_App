@@ -139,6 +139,34 @@ class OrderItem(Base):
     back_populates="items"
     )
 
+class StripePayment(Base):
+    __tablename__ = "stripe_payments"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    stripe_session_id = Column(
+        String,
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    order_id = Column(
+        Integer,
+        ForeignKey("orders.id"),
+        nullable=True
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="completed"
+    )
+
 class User(Base):
     __tablename__ = "users"
 

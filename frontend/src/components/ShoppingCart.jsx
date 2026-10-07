@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 function ShoppingCart({
     cart,
     currentUser,
@@ -6,7 +7,8 @@ function ShoppingCart({
     removeFromCart,
     placeOrder,
     orderMessage,
-    checkoutLoading
+    checkoutLoading,
+    lastOrderId
 }) {
 
     const cartTotal = cart.reduce(
@@ -30,7 +32,33 @@ function ShoppingCart({
                 </p>
             </div>
 
-            {cart.length === 0 ? (
+            {lastOrderId ? (
+                <div className="order-success">
+
+                    <div className="order-success-icon">
+                        ✓
+                    </div>
+
+                    <h3>Order Confirmed!</h3>
+
+                    <p className="order-success-number">
+                        Order #{lastOrderId}
+                    </p>
+
+                    <p>
+                        Thank you for your order.
+                        You can track your order in My Orders.
+                    </p>
+
+                    <Link
+                        to="/orders"
+                        className="view-orders-button"
+                    >
+                        View My Orders
+                    </Link>
+
+                </div>
+            ) : cart.length === 0 ? (
                 <div className="empty-cart">
                     <div className="empty-cart-icon">
                         🛒
@@ -50,12 +78,26 @@ function ShoppingCart({
                             key={item.id}
                         >
 
-                            <div>
-                                <strong>{item.name}</strong>
+                            <div className="cart-product">
 
-                                <p>
-                                    ${item.price.toFixed(2)}
-                                </p>
+                                <img
+                                    src={item.image_url || "/images/no-image.jpg"}
+                                    alt={item.name}
+                                    className="cart-product-image"
+                                    onError={(event) => {
+                                        event.currentTarget.src =
+                                            "/images/no-image.jpg"
+                                    }}
+                                />
+
+                                <div className="cart-product-info">
+                                    <strong>{item.name}</strong>
+
+                                    <p>
+                                        ${item.price.toFixed(2)} each
+                                    </p>
+                                </div>
+
                             </div>
 
                             <div className="quantity-controls">
@@ -125,6 +167,14 @@ function ShoppingCart({
                                 <p>
                                     {currentUser.email}
                                 </p>
+                            </div>
+
+                            <div className="checkout-total">
+                                <span>Order Total</span>
+
+                                <strong>
+                                    ${cartTotal.toFixed(2)}
+                                </strong>
                             </div>
 
                             <button
