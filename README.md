@@ -65,6 +65,12 @@ Customers can manage their selected products and proceed to checkout.
 
 ![Shopping Cart](screenshots/cart.png)
 
+### Stripe Checkout
+
+Customers are redirected to Stripe Checkout for secure payment processing. Successful payments are verified through Stripe webhooks before the order and inventory are updated.
+
+![Stripe Checkout](screenshots/stripe-checkout.png)
+
 ### Customer Order History
 
 Customers can view their previous orders and track order status.
