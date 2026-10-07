@@ -1,6 +1,49 @@
-# Cẩm Huê Bakery Sales App
+# 🥐 Cẩm Huệ Bakery — Full-Stack E-Commerce Application
 
-A full-stack bakery e-commerce application for selling Vietnamese snacks and sweets.
+A full-stack e-commerce application for selling Vietnamese snacks and sweets in Canada.
+
+Built with **React, FastAPI, SQLAlchemy, JWT authentication, and Stripe Checkout**, the application supports product browsing, shopping cart management, customer authentication, secure payment processing, order creation, and automatic inventory updates through Stripe webhooks.
+
+## 🚀 Project Highlights
+
+- Full-stack architecture with React frontend and FastAPI backend
+- RESTful API with FastAPI and SQLAlchemy
+- JWT-based customer authentication and protected routes
+- Product search, filtering, sorting, and inventory tracking
+- Shopping cart and Stripe Checkout integration
+- Secure Stripe webhook processing
+- Automatic order creation after successful payment
+- Automatic inventory reduction after completed checkout
+- Customer order history
+- Interactive Swagger/OpenAPI documentation
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, JavaScript, CSS |
+| Backend | Python, FastAPI |
+| Database | SQLAlchemy ORM, SQLite / PostgreSQL |
+| Authentication | JWT, Passlib, bcrypt |
+| Payments | Stripe Checkout, Stripe Webhooks |
+| API Documentation | Swagger UI / OpenAPI |
+| Version Control | Git, GitHub |
+
+## 🏗️ System Architecture
+
+Customer
+→ React Frontend
+→ FastAPI REST API
+→ SQLAlchemy
+→ Database
+
+Checkout
+→ Stripe Checkout
+→ Payment
+→ Stripe Webhook
+→ FastAPI
+→ Order Created
+→ Inventory Updated
 
 ## Screenshots
 
@@ -61,33 +104,23 @@ The backend provides interactive Swagger API documentation through FastAPI.
 
 ### Admin
 
-- Admin dashboard
-- View all customer orders
-- Update order status
-- Add products
-- Edit products
-- Delete products
-- Manage product inventory
+- Admin dashboard interface
+- View customer orders
+- Product management interface
+- Inventory visibility
 
-## Tech Stack
+## 💳 Payment & Order Flow
 
-### Backend
+1. Customer adds products to the shopping cart.
+2. FastAPI creates a Stripe Checkout Session.
+3. Customer completes payment through Stripe Checkout.
+4. Stripe sends a `checkout.session.completed` webhook.
+5. The backend verifies the Stripe webhook signature.
+6. A customer order is created in the database.
+7. Payment information is recorded.
+8. Product inventory is automatically reduced.
 
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite
-- JWT Authentication
-- Pydantic
-- python-dotenv
-
-### Frontend
-
-- React
-- Vite
-- React Router
-- CSS
-- Fetch API
+The webhook flow also includes duplicate-payment protection to prevent the same Stripe session from creating multiple orders.
 
 ## Project Structure
 
@@ -111,7 +144,12 @@ Bakery_Sales_App/
 
 ## Status
 
-The application currently includes product management, shopping cart, authentication, checkout, order management, admin tools, responsive design, and production environment configuration.
+The core e-commerce workflow is complete and has been tested end-to-end:
+
+**Product → Cart → Authentication → Stripe Checkout → Payment → Webhook → Order Creation → Inventory Update**
+
+This project is considered portfolio-ready. Additional production features are intentionally left as future improvements.
+
 
 ## Installation & Setup
 
@@ -305,12 +343,13 @@ Real `.env` files are excluded from Git and should never contain secrets committ
 
 Potential future improvements include:
 
-- Online payment integration
-- Product image upload/storage
-- Production database
-- Deployment
-- Automated testing
-- Improved order tracking
+- Expanded admin dashboard functionality
+- Product image upload and cloud storage
+- Production PostgreSQL database
+- Cloud deployment and custom domain
+- Email order confirmations
+- Automated unit and integration testing
+- Improved order tracking and shipping workflow
 
 ## What I Learned
 
@@ -327,6 +366,8 @@ This project helped me practice building a full-stack application from backend t
 - Creating responsive layouts for desktop and mobile
 - Using environment variables for development and production configuration
 - Preparing and testing a production build
+- Integrating Stripe Checkout for secure payment processing
+- Handling Stripe webhooks, payment idempotency, order creation, and inventory updates
 
 ## Author
 
